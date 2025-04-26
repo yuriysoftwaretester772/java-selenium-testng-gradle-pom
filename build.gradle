@@ -1,0 +1,106 @@
+plugins {
+    id 'java'
+    id 'io.qameta.allure' version '2.12.0'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+allure {
+    version = '2.30.0'
+    autoconfigure = true
+    aspectjweaver = true
+}
+
+dependencies {
+    testImplementation group: 'org.testng', name: 'testng', version: '7.11.0'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.31.0'
+    implementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '6.1.0'
+    implementation group: 'io.qameta.allure', name: 'allure-testng', version: '2.29.1'
+    implementation group: 'org.apache.poi', name: 'poi', version: '5.3.0'
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.3.0'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-firefox-driver', version: '4.31.0'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '4.31.0'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.16'
+    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.16'
+}
+
+test {
+    useTestNG() {
+        useDefaultListeners = true
+        suites 'src/test/testng.xml'
+    }
+    testLogging {
+        events "PASSED", "FAILED", "SKIPPED"
+    }
+    reports.html.setDestination(file("$buildDir/html"))
+}
+
+task smokeTests(type: Test) {
+    useTestNG {
+        useDefaultListeners = true
+        includeGroups 'SmokeTest'
+    }
+    testLogging {
+        events "PASSED", "FAILED", "SKIPPED"
+    }
+}
+
+task regressionTests(type: Test) {
+    useTestNG {
+        useDefaultListeners = true
+        includeGroups 'RegressionTest'
+    }
+    testLogging {
+        events "PASSED", "FAILED", "SKIPPED"
+    }
+}
+
+task allTests(type: Test) {
+    useTestNG {
+        useDefaultListeners = true
+        includeGroups 'SmokeTest', 'RegressionTest'
+    }
+    testLogging {
+        events "PASSED", "FAILED", "SKIPPED"
+    }
+}
+
+task generateAllureReport(type: Exec) {
+    description = 'Generates Allure report'
+    group = 'reporting'
+    commandLine 'allure', 'generate', '--clean', 'build/allure-results', '-o', 'build/allure-report'
+}
+
+task openAllureReport(type: Exec) {
+    description = 'Opens Allure report in the browser'
+    group = 'reporting'
+    commandLine 'allure', 'serve', 'build/allure-results'
+}
+
+task generateAndOpenAllureReport(type: Exec) {
+    description = 'Generates Allure report and opens it in the browser'
+    group = 'reporting'
+    commandLine 'sh', '-c', 'allure generate --clean build/allure-results -o build/allure-report && allure open build/allure-report'
+}
+
+test {
+    useTestNG() {
+        useDefaultListeners = true
+        suites 'src/test/testng.xml'
+    }
+    testLogging {
+        events "PASSED", "FAILED", "SKIPPED"
+    }
+    reports.html.setDestination(file("$buildDir/html"))
+
+    finalizedBy(generateAllureReport) // <--- ADD THIS LINE
+}
+
+

@@ -1,0 +1,46 @@
+# IntelliJ IDEA specific files
+.idea/
+*.iml
+*.iws
+out/
+
+# Gradle specific files
+.gradle/
+build/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test results
+test-output/
+build/reports/
+build/test-results/
+build/allure-results/
+build/allure-report/
+
+# Dependency caches
+.gradle/
+build/
+
+# Java specific files
+*.class
+*.jar
+*.war
+*.ear
+
+# Allure specific files
+allure-results/
+allure-report/
+
+# Other
+*.bak
+*.orig
